@@ -1,0 +1,7 @@
+# Behavior Service — custom PyTorch LSTM sequence classification
+fastapi==0.116.0
+uvicorn[standard]==0.35.0
+torch==2.8.0
+numpy==2.2.6
+redis==6.4.0
+pydantic==2.11.7
