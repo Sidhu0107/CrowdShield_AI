@@ -1,0 +1,43 @@
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Models and Weights (Optional, but good practice to ignore if they get too large. Excluded here just in case)
+# *.pt
+# *.task
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows specific
+.vs/
+.vscode/
+*.swp
+*.swo
+*.swn
+*.log
+*.tmp
+*~
+.idea/
+dist/
+build/
+*.egg-info/
+node_modules/
+.env.local
+.env.*.local

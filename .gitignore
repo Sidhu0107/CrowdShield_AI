@@ -1,0 +1,6 @@
+__MACOSX/
+**/__pycache__/
+*.pyc
+venv/
+CrowdShield_AI/CrowdShield_AI/venv/
+CrowdShield_AI/CrowdShield_AI/__pycache__/

@@ -1,0 +1,202 @@
+/* ═══════════════════════════════════════════════════════════════════
+   CrowdShield AI — Global Styles & Utility Classes (globals.css)
+   Resets, scrollbar theming, severity badges, card primitives.
+   ═══════════════════════════════════════════════════════════════════ */
+
+@import './theme.css';
+
+/* ── Reset ── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-family);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+a:hover {
+  color: #33DDFF;
+}
+
+button {
+  font-family: var(--font-family);
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+}
+
+input, select, textarea {
+  font-family: var(--font-family);
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  transition: border-color var(--transition-fast);
+  outline: none;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px var(--accent-primary-muted);
+}
+
+/* ── Scrollbar (Thin Cyan) ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 212, 255, 0.25);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 212, 255, 0.45);
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 212, 255, 0.25) transparent;
+}
+
+/* ── Card Primitives ── */
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(4px);
+  transition: box-shadow var(--transition-base), border-color var(--transition-base);
+}
+.card-hover:hover {
+  border-color: var(--border-active);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* ── Severity Badges ── */
+.badge-red {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-red);
+  background: var(--color-red-muted);
+  border: 1px solid var(--color-red-border);
+}
+.badge-yellow {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-yellow);
+  background: var(--color-yellow-muted);
+  border: 1px solid var(--color-yellow-border);
+}
+.badge-green {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-green);
+  background: var(--color-green-muted);
+  border: 1px solid var(--color-green-border);
+}
+
+/* ── Glow Effects ── */
+.glow-red {
+  box-shadow: var(--color-red-glow);
+}
+.glow-yellow {
+  box-shadow: var(--color-yellow-glow);
+}
+.glow-green {
+  box-shadow: var(--color-green-glow);
+}
+
+/* ── Green Pulse Animation (System Status) ── */
+@keyframes pulse-green {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(0, 230, 118, 0);
+  }
+}
+.pulse-green {
+  animation: pulse-green 2s infinite;
+}
+
+/* ── Red Pulse Animation (Critical Alert) ── */
+@keyframes pulse-red {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 59, 59, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(255, 59, 59, 0);
+  }
+}
+.pulse-red {
+  animation: pulse-red 1.2s infinite;
+}
+
+/* ── Cyan accent pulse ── */
+@keyframes pulse-cyan {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ── Utility: Fade In ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+/* ── Typography Utilities ── */
+.text-bright { color: var(--text-bright); }
+.text-secondary { color: var(--text-secondary); }
+.text-cyan { color: var(--accent-primary); }
+.text-red { color: var(--color-red); }
+.text-yellow { color: var(--color-yellow); }
+.text-green { color: var(--color-green); }
+.font-mono { font-family: 'JetBrains Mono', 'Fira Code', monospace; }

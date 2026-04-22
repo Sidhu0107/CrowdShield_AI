@@ -1,0 +1,157 @@
+services:
+  redis:
+    image: redis:7.2-alpine
+    container_name: crowdshield-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: crowdshield-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  ingestion-service:
+    build:
+      context: ./backend/ingestion-service
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      REDIS_URL: ${REDIS_URL}
+    depends_on:
+      - redis
+    ports:
+      - "8001:8000"
+    restart: unless-stopped
+
+  vision-service:
+    build:
+      context: ./backend/vision-service
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      REDIS_URL: ${REDIS_URL}
+      YOLO_MODEL: yolov8n.pt
+      YOLO_CONF: 0.35
+    depends_on:
+      - redis
+      - ingestion-service
+    ports:
+      - "8002:8000"
+    restart: unless-stopped
+
+  pose-service:
+    build:
+      context: ./backend/pose-service
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      REDIS_URL: ${REDIS_URL}
+      FRAME_CACHE_SIZE: 300
+    depends_on:
+      - redis
+      - vision-service
+    ports:
+      - "8003:8000"
+    restart: unless-stopped
+
+  behavior-service:
+    build:
+      context: ./backend/behavior-service
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      REDIS_URL: ${REDIS_URL}
+      FEATURE_VECTOR_SIZE: 9
+      BEHAVIOR_WINDOW_SIZE: ${BEHAVIOR_WINDOW_SIZE}
+      LSTM_MODEL_PATH: model.pt
+    depends_on:
+      - redis
+      - pose-service
+    ports:
+      - "8004:8000"
+    restart: unless-stopped
+
+  alert-service:
+    build:
+      context: ./backend/alert-service
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      REDIS_URL: ${REDIS_URL}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      ALERT_PERSISTENCE_FRAMES: ${ALERT_PERSISTENCE_FRAMES}
+    depends_on:
+      - redis
+      - postgres
+      - behavior-service
+    ports:
+      - "8005:8000"
+    restart: unless-stopped
+
+  api-gateway:
+    build:
+      context: ./backend/api-gateway
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      REDIS_URL: ${REDIS_URL}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      - redis
+      - postgres
+      - alert-service
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      VITE_API_PROXY_TARGET: http://api-gateway:8000
+    depends_on:
+      - api-gateway
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+  api-dash:
+    build: ./backend/api
+    ports:
+      - "8008:8000"
+    volumes:
+      - "./training:/app/training"
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      - PYTHONPATH=/app
+
+  frontend-dash:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - "./frontend:/app"
+    ports:
+      - "5173:5173"
+    command: /bin/sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    depends_on:
+      - api-dash
+
+volumes:
+  postgres_data:
