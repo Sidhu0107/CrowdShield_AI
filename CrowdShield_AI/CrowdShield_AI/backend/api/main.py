@@ -12,6 +12,7 @@ import cv2
 from fastapi import BackgroundTasks, FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 # Ensure project root is in sys.path for imports from 'training'
@@ -525,6 +526,12 @@ async def health() -> Dict[str, Any]:
             "live_running": state.live_running,
             "events_buffer": len(state.events),
         }
+
+
+# Serve React frontend — must be mounted LAST so API routes take priority
+_frontend_dist = Path(__file__).parent.parent.parent / "frontend" / "dist"
+if _frontend_dist.exists():
+    app.mount("/", StaticFiles(directory=str(_frontend_dist), html=True), name="static")
 
 
 if __name__ == "__main__":
