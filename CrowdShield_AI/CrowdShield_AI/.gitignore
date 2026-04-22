@@ -35,7 +35,6 @@ Thumbs.db
 *.tmp
 *~
 .idea/
-dist/
 build/
 *.egg-info/
 node_modules/
